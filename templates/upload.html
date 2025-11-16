@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📤 Upload Files - File Management System</title>
+    <style>
+        /* Keep your existing styles and add new ones */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-bar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .nav-bar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .nav-bar a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-bar a.active {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .upload-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .upload-zone:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+            transform: translateY(-2px);
+        }
+
+        .upload-zone.dragover {
+            border-color: #4CAF50;
+            background: #e8f5e8;
+        }
+
+        .upload-zone .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .upload-zone h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .upload-zone p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .file-list {
+            margin-top: 30px;
+        }
+
+        .file-item {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .file-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .file-details h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .file-details p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn {
+            background: #ff4757;
+            color: white;
+        }
+
+        .remove-btn:hover {
+            background: #ff3742;
+        }
+
+        .upload-all-btn {
+            background: #2ed573;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-all-btn:hover {
+            background: #26d466;
+            transform: translateY(-2px);
+        }
+
+        .upload-all-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .success-message {
+            background: #2ed573;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message {
+            background: #ff4757;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .supported-formats {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        .supported-formats h4 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .format-category {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .format-category h5 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .format-category p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📤 Upload Files</h1>
+        <p>Upload any type of file - images, videos, documents, and more!</p>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <a href="/" class="">🏠 Priority Analyzer</a>
+        <a href="/upload" class="active">📤 Upload Files</a>
+        <a href="/dashboard">📊 Dashboard</a>
+    </div>
+
+    <!-- NEW: Compact Network Status -->
+    <div id="compactNetworkStatus" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: center; color: white;">
+        <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 8px;">🌐 Network Status</div>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <span>📶 <span id="compactWifiName">Checking...</span></span>
+            <span>⬆️ <span id="compactUploadSpeed">0.0 Mbps</span></span>
+            <span>⚡ <span id="compactLatency">0 ms</span></span>
+            <span id="compactHealthStatus" style="padding: 4px 12px; background: rgba(255,255,255,0.2); border-radius: 15px; font-size: 0.9em;">Checking...</span>
+        </div>
+    </div>
+
+    <div class="upload-container">
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📁</div>
+            <h3>Drag & Drop Files Here</h3>
+            <p>Or click to select files from your computer</p>
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                Choose Files
+            </button>
+            <input type="file" id="fileInput" class="file-input" multiple>
+        </div>
+
+        <!-- File List -->
+        <div class="file-list" id="fileList" style="display: none;">
+            <h3>📋 Selected Files</h3>
+            <div id="selectedFiles"></div>
+            <button class="upload-all-btn" id="uploadAllBtn" onclick="uploadAllFiles()">
+                🚀 Upload All Files
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Messages -->
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Supported Formats -->
+        <div class="supported-formats">
+            <h4>🎯 Supported File Types</h4>
+            <div class="format-grid">
+                <div class="format-category">
+                    <h5>🖼️ Images</h5>
+                    <p>JPG, PNG, GIF, BMP, WebP, SVG</p>
+                </div>
+                <div class="format-category">
+                    <h5>🎥 Videos</h5>
+                    <p>MP4, AVI, MKV, MOV, WMV</p>
+                </div>
+                <div class="format-category">
+                    <h5>🎵 Audio</h5>
+                    <p>MP3, WAV, FLAC, AAC, OGG</p>
+                </div>
+                <div class="format-category">
+                    <h5>📄 Documents</h5>
+                    <p>PDF, DOC, DOCX, TXT, RTF</p>
+                </div>
+                <div class="format-category">
+                    <h5>📊 Spreadsheets</h5>
+                    <p>XLS, XLSX, CSV, ODS</p>
+                </div>
+                <div class="format-category">
+                    <h5>📈 Presentations</h5>
+                    <p>PPT, PPTX, ODP</p>
+                </div>
+                <div class="format-category">
+                    <h5>🗜️ Archives</h5>
+                    <p>ZIP, RAR, 7Z, TAR, GZ</p>
+                </div>
+                <div class="format-category">
+                    <h5>📋 Other</h5>
+                    <p>Any file type supported!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // File upload functionality
+        let selectedFiles = [];
+        
+        // Get DOM elements
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const selectedFilesDiv = document.getElementById('selectedFiles');
+        const uploadAllBtn = document.getElementById('uploadAllBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // File input change handler
+        fileInput.addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+        });
+
+        // Drag and drop handlers
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // Click handler for upload zone
+        uploadZone.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        // Handle selected files
+        function handleFiles(files) {
+            for (let file of files) {
+                selectedFiles.push({
+                    file: file,
+                    id: Date.now() + Math.random()
+                });
+            }
+            updateFileList();
+        }
+
+        // Update file list display
+        function updateFileList() {
+            if (selectedFiles.length === 0) {
+                fileList.style.display = 'none';
+                return;
+            }
+
+            fileList.style.display = 'block';
+            selectedFilesDiv.innerHTML = '';
+
+            selectedFiles.forEach((fileObj, index) => {
+                const file = fileObj.file;
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'file-item';
+                
+                const fileIcon = getFileIcon(file.type);
+                const fileSize = formatFileSize(file.size);
+                
+                fileDiv.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-icon">${fileIcon}</div>
+                        <div class="file-details">
+                            <h4>${file.name}</h4>
+                            <p>${fileSize} • ${file.type || 'Unknown type'}</p>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="action-btn remove-btn" onclick="removeFile(${index})">
+                            ❌ Remove
+                        </button>
+                    </div>
+                `;
+                
+                selectedFilesDiv.appendChild(fileDiv);
+            });
+        }
+
+        // Remove file from list
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+        }
+
+        // Get file icon based on file type
+        function getFileIcon(mimeType) {
+            if (mimeType.startsWith('image/')) return '🖼️';
+            if (mimeType.startsWith('video/')) return '🎥';
+            if (mimeType.startsWith('audio/')) return '🎵';
+            if (mimeType.includes('pdf')) return '📄';
+            if (mimeType.includes('document') || mimeType.includes('text')) return '📝';
+            if (mimeType.includes('spreadsheet') || mimeType.includes('csv')) return '📊';
+            if (mimeType.includes('presentation')) return '📈';
+            if (mimeType.includes('zip') || mimeType.includes('archive')) return '🗜️';
+            return '📋';
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        // Upload all files
+        async function uploadAllFiles() {
+            if (selectedFiles.length === 0) return;
+
+            uploadAllBtn.disabled = true;
+            progressBar.style.display = 'block';
+            hideMessages();
+
+            try {
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const fileObj = selectedFiles[i];
+                    const formData = new FormData();
+                    formData.append('file', fileObj.file);
+
+                    // Update progress
+                    const progress = ((i + 1) / selectedFiles.length) * 100;
+                    progressFill.style.width = progress + '%';
+
+                    // Upload file
+                    const response = await fetch('/api/files/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Upload failed for ${fileObj.file.name}`);
+                    }
+                }
+
+                // Success
+                showSuccess(`🎉 Successfully uploaded ${selectedFiles.length} file(s)!`);
+                selectedFiles = [];
+                updateFileList();
+                fileInput.value = '';
+
+                // Redirect to dashboard after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 2000);
+
+            } catch (error) {
+                showError(`❌ Upload failed: ${error.message}`);
+            } finally {
+                uploadAllBtn.disabled = false;
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+            }
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+
+        // Hide messages
+        function hideMessages() {
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+        }
+
+        // =============================================================================
+        // 🌐 COMPACT NETWORK MONITORING FOR UPLOAD PAGE
+        // =============================================================================
+        // Baby, this shows your internet status while you upload files!
+        
+        async function updateCompactNetworkStatus() {
+            try {
+                const response = await fetch('/api/network/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update compact display (like updating a small report card)
+                    document.getElementById('compactWifiName').textContent = data.wifi_name || 'Unknown';
+                    document.getElementById('compactUploadSpeed').textContent = `${data.upload_speed.toFixed(1)} Mbps`;
+                    document.getElementById('compactLatency').textContent = `${data.latency.toFixed(0)} ms`;
+                    
+                    // Update health status with colors
+                    const healthElement = document.getElementById('compactHealthStatus');
+                    healthElement.textContent = data.health_status;
+                    
+                    // Color coding (like traffic lights)
+                    if (data.health_status === 'Excellent') {
+                        healthElement.style.background = 'rgba(34, 197, 94, 0.8)';
+                    } else if (data.health_status === 'Good') {
+                        healthElement.style.background = 'rgba(59, 130, 246, 0.8)';
+                    } else if (data.health_status === 'Weak') {
+                        healthElement.style.background = 'rgba(251, 191, 36, 0.8)';
+                    } else {
+                        healthElement.style.background = 'rgba(239, 68, 68, 0.8)';
+                    }
+                }
+            } catch (error) {
+                // Silently handle errors - no need to disturb the user
+                console.log('Network status temporarily unavailable');
+            }
+        }
+        
+        // Start compact network monitoring
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial update
+            updateCompactNetworkStatus();
+            
+            // Update every 2 seconds (less frequent for upload page)
+            setInterval(updateCompactNetworkStatus, 2000);
+        });
+        
+        // =============================================================================
+        // END COMPACT NETWORK MONITORING
+        // =============================================================================
+    </script>
+    
+    <!-- ⭐ AUTO-HEALING UPLOAD MAGIC ⭐ -->
+    <script src="/static/js/auto_healing_client.js"></script>
+    <script src="/static/js/healing_upload_ui.js"></script>
+    
+    <script>
+        // =============================================================================
+        // ⭐ ENHANCED UPLOAD WITH AUTO-HEALING MAGIC ⭐
+        // =============================================================================
+        
+        // Baby, let's make your uploads super strong and magical! ✨
+        
+        // Override the uploadAllFiles function to use healing magic
+        async function uploadAllFiles() {
+            if (selectedFiles.length === 0) return;
+
+            // Check if healing magic is available
+            if (window.healingUploadUI && window.healingUploadUI.healingClient) {
+                console.log('🩺 Using Auto-Healing Upload Magic! ✨');
+                await uploadWithHealingMagic();
+            } else {
+                console.log('📋 Using basic upload method...');
+                await uploadWithBasicMethod();
+            }
+        }
+        
+        // Baby, this uses our beautiful healing magic! 🌟
+        async function uploadWithHealingMagic() {
+            uploadAllBtn.disabled = true;
+            hideMessages();
+            
+            let successCount = 0;
+            let failedCount = 0;
+            let totalFiles = selectedFiles.length;
+            
+            // Show healing message
+            showInfo(`🩺 Starting healing upload for ${totalFiles} file(s)... Magic in progress! ✨`);
+            
+            try {
+                // Upload each file with healing magic
+                const uploadPromises = [];
+                
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const fileObj = selectedFiles[i];
+                    const file = fileObj.file;
+                    
+                    console.log(`🎯 Starting healing upload for: ${file.name}`);
+                    
+                    // Start healing upload (don't await yet, let them run concurrently for smaller files)
+                    const uploadPromise = window.healingUploadUI.startHealingUpload(file, {
+                        chunkSize: 256 * 1024, // 256KB chunks for better healing
+                        maxRetries: 3,
+                        autoRetry: true
+                    }).then(result => {
+                        if (result.success) {
+                            successCount++;
+                            console.log(`✅ Healing upload completed: ${file.name}`);
+                        } else {
+                            failedCount++;
+                            console.error(`💔 Healing upload failed: ${file.name}`, result);
+                        }
+                        return { file: file.name, result };
+                    }).catch(error => {
+                        failedCount++;
+                        console.error(`💔 Healing upload error: ${file.name}`, error);
+                        return { file: file.name, result: { success: false, error: error.message } };
+                    });
+                    
+                    uploadPromises.push(uploadPromise);
+                }
+                
+                // Wait for all uploads to complete
+                const results = await Promise.all(uploadPromises);
+                
+                // Show final results
+                if (successCount === totalFiles) {
+                    showSuccess(`🎉 All ${totalFiles} file(s) uploaded successfully with healing magic! ✨`);
+                    
+                    // Clear the file list
+                    selectedFiles = [];
+                    updateFileList();
+                    fileInput.value = '';
+                    
+                    // Redirect to dashboard after celebration
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 3000);
+                    
+                } else if (successCount > 0) {
+                    showWarning(`⚠️ ${successCount} of ${totalFiles} files uploaded successfully. ${failedCount} files failed but you can retry them using the retry buttons below!`);
+                } else {
+                    showError(`💔 All uploads failed. Don't worry - your files are safe and you can retry them using the retry buttons below! The healing system will remember your progress.`);
+                }
+                
+                // Add a "Retry All Failed" button if there are failures
+                if (failedCount > 0) {
+                    addRetryAllButton(failedCount);
+                }
+                
+            } catch (error) {
+                console.error('💔 Healing upload error:', error);
+                showError(`💔 Healing upload failed: ${error.message}. Your files are safe - please try again!`);
+                
+            } finally {
+                uploadAllBtn.disabled = false;
+            }
+        }
+        
+        // Baby, this is the backup method when healing magic isn't ready
+        async function uploadWithBasicMethod() {
+            uploadAllBtn.disabled = true;
+            progressBar.style.display = 'block';
+            hideMessages();
+
+            try {
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const fileObj = selectedFiles[i];
+                    const formData = new FormData();
+                    formData.append('file', fileObj.file);
+
+                    // Update progress
+                    const progress = ((i + 1) / selectedFiles.length) * 100;
+                    progressFill.style.width = progress + '%';
+
+                    // Upload file
+                    const response = await fetch('/api/files/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Upload failed for ${fileObj.file.name}`);
+                    }
+                }
+
+                // Success
+                showSuccess(`🎉 Successfully uploaded ${selectedFiles.length} file(s)!`);
+                selectedFiles = [];
+                updateFileList();
+                fileInput.value = '';
+
+                // Redirect to dashboard after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 2000);
+
+            } catch (error) {
+                showError(`❌ Upload failed: ${error.message}`);
+            } finally {
+                uploadAllBtn.disabled = false;
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+            }
+        }
+        
+        // Baby, this shows information messages (like friendly notes)
+        function showInfo(message) {
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'info-message';
+            infoDiv.style.cssText = `
+                background: #3b82f6;
+                color: white;
+                padding: 15px;
+                border-radius: 10px;
+                margin-top: 20px;
+                text-align: center;
+                display: block;
+            `;
+            infoDiv.textContent = message;
+            
+            // Remove existing info messages
+            const existing = document.querySelector('.info-message');
+            if (existing) existing.remove();
+            
+            // Add new message
+            document.querySelector('.upload-container').appendChild(infoDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (infoDiv.parentNode) infoDiv.remove();
+            }, 5000);
+        }
+        
+        // Baby, this shows warning messages (like gentle reminders)
+        function showWarning(message) {
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'warning-message';
+            warningDiv.style.cssText = `
+                background: #f59e0b;
+                color: white;
+                padding: 15px;
+                border-radius: 10px;
+                margin-top: 20px;
+                text-align: center;
+                display: block;
+            `;
+            warningDiv.textContent = message;
+            
+            // Remove existing warning messages
+            const existing = document.querySelector('.warning-message');
+            if (existing) existing.remove();
+            
+            // Add new message
+            document.querySelector('.upload-container').appendChild(warningDiv);
+        }
+        
+        // Enhance existing drag and drop to show healing info
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+            
+            // Show healing readiness message
+            if (files.length > 0 && window.healingUploadUI && window.healingUploadUI.healingClient) {
+                showInfo(`🩺 ${files.length} file(s) ready for healing upload! Auto-retry, resume, and corruption detection enabled! ✨`);
+            }
+        });
+        
+        // Also enhance file input change
+        fileInput.addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+            
+            const files = e.target.files;
+            if (files.length > 0 && window.healingUploadUI && window.healingUploadUI.healingClient) {
+                showInfo(`🩺 ${files.length} file(s) ready for healing upload! Your uploads are now super strong! 💪✨`);
+            }
+        });
+        
+        // Baby, this adds a retry all failed uploads button!
+        function addRetryAllButton(failedCount) {
+            // Remove existing retry all button if present
+            const existingBtn = document.getElementById('retryAllBtn');
+            if (existingBtn) existingBtn.remove();
+            
+            // Create retry all button
+            const retryAllBtn = document.createElement('button');
+            retryAllBtn.id = 'retryAllBtn';
+            retryAllBtn.className = 'upload-all-btn';
+            retryAllBtn.style.cssText = `
+                background: linear-gradient(135deg, #f59e0b, #f97316);
+                margin-top: 10px;
+            `;
+            retryAllBtn.innerHTML = `🔄 Retry All Failed Uploads (${failedCount})`;
+            retryAllBtn.onclick = retryAllFailedUploads;
+            
+            // Add after the main upload button
+            const uploadBtn = document.getElementById('uploadAllBtn');
+            uploadBtn.parentNode.insertBefore(retryAllBtn, uploadBtn.nextSibling);
+        }
+        
+        // Baby, this retries all failed uploads!
+        async function retryAllFailedUploads() {
+            if (!window.healingUploadUI) {
+                showError('Healing system not available!');
+                return;
+            }
+            
+            const retryBtn = document.getElementById('retryAllBtn');
+            retryBtn.disabled = true;
+            retryBtn.innerHTML = '🔄 Retrying Failed Uploads...';
+            
+            showInfo('🔄 Retrying all failed uploads with healing magic! ✨');
+            
+            // Get all failed uploads and retry them
+            const failedUploads = [];
+            for (let [uploadId, uploadInfo] of window.healingUploadUI.activeUploads) {
+                if (uploadInfo.status === 'failed') {
+                    failedUploads.push({ uploadId, uploadInfo });
+                }
+            }
+            
+            let retrySuccessCount = 0;
+            let retryFailedCount = 0;
+            
+            for (let { uploadId, uploadInfo } of failedUploads) {
+                try {
+                    await window.healingUploadUI.retryUpload(uploadId);
+                    
+                    // Check if retry was successful
+                    const updatedInfo = window.healingUploadUI.activeUploads.get(uploadId);
+                    if (updatedInfo && updatedInfo.status === 'completed') {
+                        retrySuccessCount++;
+                    } else {
+                        retryFailedCount++;
+                    }
+                    
+                } catch (error) {
+                    console.error(`Retry failed for ${uploadInfo.filename}:`, error);
+                    retryFailedCount++;
+                }
+            }
+            
+            // Show results
+            if (retrySuccessCount === failedUploads.length) {
+                showSuccess(`🎉 All ${retrySuccessCount} failed uploads were successfully healed! ✨`);
+                retryBtn.remove();
+            } else if (retrySuccessCount > 0) {
+                showWarning(`⚠️ ${retrySuccessCount} uploads healed, ${retryFailedCount} still need attention. Keep trying - healing takes patience! 💕`);
+                retryBtn.innerHTML = `🔄 Retry Remaining Failed (${retryFailedCount})`;
+            } else {
+                showError(`💔 Retries didn't succeed this time. Check your network connection and try again. Your files are safe! 💕`);
+                retryBtn.innerHTML = `🔄 Try Again (${retryFailedCount})`;
+            }
+            
+            retryBtn.disabled = false;
+        }
+        
+        // Show healing status when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a moment for healing systems to initialize
+            setTimeout(() => {
+                if (window.healingUploadUI && window.healingUploadUI.healingClient) {
+                    console.log('🎉 Auto-Healing Upload System is ACTIVE! Your uploads are now magical! ✨');
+                    
+                    // Add a subtle indicator to the upload button
+                    const btn = document.getElementById('uploadAllBtn');
+                    if (btn) {
+                        btn.innerHTML = '🩺 Upload All Files (with Healing Magic!)';
+                        btn.title = 'Auto-retry, resume, corruption detection, and network reconnection enabled!';
+                    }
+                } else {
+                    console.log('📋 Using standard upload system');
+                }
+            }, 1000);
+        });
+        
+        // =============================================================================
+        // END AUTO-HEALING UPLOAD MAGIC
+        // =============================================================================
+    </script>
+    
+    <!-- 🤖 REAL AI CHATBOT POWERED BY GEMINI -->
+    <script src="/static/js/SmartBrain.js"></script>
+    <script src="/static/js/GeminiChatAssistant.js"></script>
+    
+    <!-- 📶 WIFI FINDER - Live Hotspot Discovery -->
+    <script src="/static/js/WiFiFinder.js"></script>
+    
+    <script>
+        // Initialize smart features for upload page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a moment for all systems to load, then activate features!
+            setTimeout(() => {
+                // Activate AI Chatbot
+                GeminiChatAssistant.init();
+                console.log('🧠 Gemini AI Assistant activated on upload page! Ready for intelligent file management help!');
+                
+                // Activate WiFi Finder
+                WiFiFinder.init();
+                console.log('📶 WiFi Finder activated on upload page! Find best WiFi for uploads!');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 File Dashboard - File Management System</title>
+    <style>
+        /* Keep your existing styles and add new ones */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-bar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .nav-bar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .nav-bar a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-bar a.active {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* Search and Filter */
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* File Grid */
+        .files-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .file-card {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .file-card:hover {
+            transform: translateY(-3px);
+            border-color: #667eea;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .file-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+
+        .file-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+            word-break: break-word;
+        }
+
+        .file-meta {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .preview-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .preview-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .download-btn {
+            background: #2ed573;
+            color: white;
+        }
+
+        .download-btn:hover {
+            background: #26d466;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #ff3742;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .empty-state p {
+            margin-bottom: 25px;
+        }
+
+        .upload-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            display: inline-block;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .upload-link:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input {
+                min-width: auto;
+            }
+
+            .files-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 File Dashboard</h1>
+        <p>Manage all your uploaded files in one place</p>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <a href="/" class="">🏠 Priority Analyzer</a>
+        <a href="/upload">📤 Upload Files</a>
+        <a href="/dashboard" class="active">📊 Dashboard</a>
+    </div>
+
+    <!-- NEW: Compact Network Status -->
+    <div id="compactNetworkStatus" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: center; color: white;">
+        <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 8px;">🌐 Network Status</div>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <span>📶 <span id="compactWifiName">Checking...</span></span>
+            <span>⬆️ <span id="compactUploadSpeed">0.0 Mbps</span></span>
+            <span>⚡ <span id="compactLatency">0 ms</span></span>
+            <span id="compactHealthStatus" style="padding: 4px 12px; background: rgba(255,255,255,0.2); border-radius: 15px; font-size: 0.9em;">Checking...</span>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Statistics Cards -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon">📁</div>
+                <div class="stat-number" id="totalFiles">-</div>
+                <div class="stat-label">Total Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💾</div>
+                <div class="stat-number" id="totalSize">-</div>
+                <div class="stat-label">Storage Used</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-number" id="latestUpload">-</div>
+                <div class="stat-label">Latest Upload</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-number" id="systemStatus">Active</div>
+                <div class="stat-label">System Status</div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Controls -->
+        <div class="controls">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search files by name...">
+            <select id="typeFilter" class="filter-select">
+                <option value="">All Types</option>
+                <option value="image">🖼️ Images</option>
+                <option value="video">🎥 Videos</option>
+                <option value="audio">🎵 Audio</option>
+                <option value="pdf">📄 PDFs</option>
+                <option value="document">📝 Documents</option>
+                <option value="spreadsheet">📊 Spreadsheets</option>
+                <option value="presentation">📈 Presentations</option>
+                <option value="archive">🗜️ Archives</option>
+                <option value="other">📋 Other</option>
+            </select>
+            <button class="refresh-btn" onclick="loadFiles()">🔄 Refresh</button>
+        </div>
+
+        <!-- Files Section -->
+        <div class="files-section">
+            <div class="section-header">
+                <h2 class="section-title">📋 Your Files</h2>
+            </div>
+            
+            <div id="filesContainer">
+                <div class="loading">
+                    <div class="loading-spinner">⏳</div>
+                    <p>Loading your files...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allFiles = [];
+        let filteredFiles = [];
+
+        // Load files when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFiles();
+            
+            // Set up search functionality
+            document.getElementById('searchInput').addEventListener('input', filterFiles);
+            document.getElementById('typeFilter').addEventListener('change', filterFiles);
+        });
+
+        // Load files from server
+        async function loadFiles() {
+            try {
+                // Load file statistics
+                const statsResponse = await fetch('/api/files/stats');
+                if (statsResponse.ok) {
+                    const stats = await statsResponse.json();
+                    updateStats(stats);
+                }
+
+                // Load files list
+                const filesResponse = await fetch('/api/files/list');
+                if (filesResponse.ok) {
+                    const files = await filesResponse.json();
+                    allFiles = files;
+                    filteredFiles = files;
+                    displayFiles();
+                } else {
+                    showError('Failed to load files');
+                }
+            } catch (error) {
+                console.error('Error loading files:', error);
+                showError('Error loading files: ' + error.message);
+            }
+        }
+
+        // Update statistics display
+        function updateStats(stats) {
+            document.getElementById('totalFiles').textContent = stats.total_files;
+            document.getElementById('totalSize').textContent = formatFileSize(stats.total_size);
+            
+            const latestUpload = stats.latest_upload;
+            if (latestUpload && latestUpload !== 'No uploads yet') {
+                const date = new Date(latestUpload);
+                document.getElementById('latestUpload').textContent = date.toLocaleDateString();
+            } else {
+                document.getElementById('latestUpload').textContent = 'None';
+            }
+        }
+
+        // Display files in grid
+        function displayFiles() {
+            const container = document.getElementById('filesContainer');
+            
+            if (filteredFiles.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h3>No Files Found</h3>
+                        <p>Upload some files to get started!</p>
+                        <a href="/upload" class="upload-link">📤 Upload Files</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const filesGrid = document.createElement('div');
+            filesGrid.className = 'files-grid';
+
+            filteredFiles.forEach(file => {
+                const fileCard = createFileCard(file);
+                filesGrid.appendChild(fileCard);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(filesGrid);
+        }
+
+        // Create individual file card
+        function createFileCard(file) {
+            const card = document.createElement('div');
+            card.className = 'file-card';
+
+            const fileIcon = getFileIcon(file.file_type);
+            const uploadDate = new Date(file.upload_date).toLocaleDateString();
+            const fileSize = formatFileSize(file.file_size);
+
+            card.innerHTML = `
+                <div class="file-header">
+                    <div class="file-icon">${fileIcon}</div>
+                    <div class="file-info">
+                        <h3>${file.original_filename}</h3>
+                        <div class="file-meta">📏 ${fileSize}</div>
+                        <div class="file-meta">📅 ${uploadDate}</div>
+                        <div class="file-meta">📋 ${file.file_type}</div>
+                    </div>
+                </div>
+                <div class="file-actions">
+                    ${isPreviewable(file.file_type) ? 
+                        `<a href="/preview/${file.id}" class="action-btn preview-btn">👀 Preview</a>` : 
+                        `<span class="action-btn preview-btn" style="opacity: 0.5; cursor: not-allowed;">👀 Preview</span>`
+                    }
+                    <a href="/api/files/download/${file.id}" class="action-btn download-btn">⬇️ Download</a>
+                    <button class="action-btn delete-btn" onclick="deleteFile('${file.id}', '${file.original_filename}')">🗑️ Delete</button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Filter files based on search and type
+        function filterFiles() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+
+            filteredFiles = allFiles.filter(file => {
+                const matchesSearch = file.original_filename.toLowerCase().includes(searchTerm);
+                const matchesType = !typeFilter || file.file_type === typeFilter;
+                return matchesSearch && matchesType;
+            });
+
+            displayFiles();
+        }
+
+        // Delete file
+        async function deleteFile(fileId, filename) {
+            if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/files/delete/${fileId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showSuccess(`File "${filename}" deleted successfully!`);
+                    loadFiles(); // Reload files
+                } else {
+                    const error = await response.text();
+                    showError(`Failed to delete file: ${error}`);
+                }
+            } catch (error) {
+                console.error('Error deleting file:', error);
+                showError('Error deleting file: ' + error.message);
+            }
+        }
+
+        // Get file icon based on file type
+        function getFileIcon(fileType) {
+            const icons = {
+                'image': '🖼️',
+                'video': '🎥',
+                'audio': '🎵',
+                'pdf': '📄',
+                'document': '📝',
+                'spreadsheet': '📊',
+                'presentation': '📈',
+                'archive': '🗜️',
+                'other': '📋'
+            };
+            return icons[fileType] || '📋';
+        }
+
+        // Check if file can be previewed
+        function isPreviewable(fileType) {
+            return ['image', 'video', 'audio', 'pdf'].includes(fileType);
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            // You can implement a toast notification here
+            alert(message);
+        }
+
+        // Show error message
+        function showError(message) {
+            // You can implement a toast notification here
+            alert(message);
+        }
+
+        // =============================================================================
+        // 🌐 COMPACT NETWORK MONITORING FOR DASHBOARD PAGE
+        // =============================================================================
+        // Baby, this shows your internet status while managing files!
+        
+        async function updateCompactNetworkStatus() {
+            try {
+                const response = await fetch('/api/network/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update compact display
+                    document.getElementById('compactWifiName').textContent = data.wifi_name || 'Unknown';
+                    document.getElementById('compactUploadSpeed').textContent = `${data.upload_speed.toFixed(1)} Mbps`;
+                    document.getElementById('compactLatency').textContent = `${data.latency.toFixed(0)} ms`;
+                    
+                    // Update health status with colors
+                    const healthElement = document.getElementById('compactHealthStatus');
+                    healthElement.textContent = data.health_status;
+                    
+                    // Color coding
+                    if (data.health_status === 'Excellent') {
+                        healthElement.style.background = 'rgba(34, 197, 94, 0.8)';
+                    } else if (data.health_status === 'Good') {
+                        healthElement.style.background = 'rgba(59, 130, 246, 0.8)';
+                    } else if (data.health_status === 'Weak') {
+                        healthElement.style.background = 'rgba(251, 191, 36, 0.8)';
+                    } else {
+                        healthElement.style.background = 'rgba(239, 68, 68, 0.8)';
+                    }
+                }
+            } catch (error) {
+                console.log('Network status temporarily unavailable');
+            }
+        }
+        
+        // Start compact network monitoring when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a bit then start monitoring
+            setTimeout(() => {
+                updateCompactNetworkStatus();
+                setInterval(updateCompactNetworkStatus, 3000); // Every 3 seconds for dashboard
+            }, 1000);
+        });
+        
+        // =============================================================================
+        // END COMPACT NETWORK MONITORING
+        // =============================================================================
+    </script>
+
+    <!-- 🤖 SMART CHATBOT ASSISTANT -->
+    <script src="/static/js/SmartBrain.js"></script>
+    <!-- 🤖 REAL AI CHATBOT POWERED BY GEMINI -->
+    <script src="/static/js/GeminiChatAssistant.js"></script>
+    
+    <!-- 📶 WIFI FINDER - Live Hotspot Discovery -->
+    <script src="/static/js/WiFiFinder.js"></script>
+    
+    <script>
+        // Initialize all smart features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a moment for all systems to load, then activate features!
+            setTimeout(() => {
+                // Activate AI Chatbot
+                GeminiChatAssistant.init();
+                console.log('🧠 Gemini AI Assistant activated! Ready for intelligent conversations!');
+                
+                // Activate WiFi Finder
+                WiFiFinder.init();
+                console.log('📶 WiFi Finder activated! Ready to discover hotspots!');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            transition: border-color 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+        }
+        .file-input {
+            display: none;
+        }
+        .upload-btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .upload-btn:hover {
+            background: #0056b3;
+        }
+        .file-list {
+            margin-top: 20px;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        .priority-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            color: white;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .priority-1 { background-color: #dc3545; }
+        .priority-2 { background-color: #fd7e14; }
+        .priority-3 { background-color: #ffc107; color: black; }
+        .priority-4 { background-color: #20c997; }
+        .priority-5 { background-color: #0dcaf0; }
+        .priority-6 { background-color: #6f42c1; }
+        .priority-7 { background-color: #6c757d; }
+        .priority-8 { background-color: #343a40; }
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+        .category-tag {
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Priority Analyzer</h1>
+        <p style="text-align: center; color: #666;">
+            Upload multiple files to analyze their priorities for optimized chunking
+        </p>
+        <div style="text-align: center; margin: 10px 0; padding: 10px; background: #e8f4fd; border-radius: 5px;">
+            <strong>Current Mode:</strong> {{ model_status or "Rule-based Fallback" }}
+        </div>
+        
+        <!-- NEW: Navigation to File Management System -->
+        <div style="text-align: center; margin: 20px 0; padding: 15px; background: #d4edda; border-radius: 8px; border: 1px solid #c3e6cb;">
+            <h3 style="margin: 0 0 10px 0; color: #155724;">📁 NEW: File Management System</h3>
+            <p style="margin: 0 0 15px 0; color: #155724;">Upload, preview, and manage any file type alongside your priority analysis!</p>
+            <a href="/upload" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; font-weight: bold;">📤 Upload Files</a>
+            <a href="/dashboard" style="background: #17a2b8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 0 10px; font-weight: bold;">📊 File Dashboard</a>
+        </div>
+
+        <!-- NEW: Real-Time Network Monitoring Dashboard -->
+        <div id="networkMonitor" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h3 style="margin: 0 0 15px 0; text-align: center; font-size: 1.4em;">🌐 Real-Time Network Monitor</h3>
+            <p style="text-align: center; margin: 0 0 20px 0; opacity: 0.9; font-size: 0.95em;">Watching your internet playground every second!</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 5px;">📶 WiFi Network</div>
+                    <div id="wifiName" style="font-size: 1.1em; font-weight: bold;">Checking...</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 5px;">⬆️ Upload Speed</div>
+                    <div id="uploadSpeed" style="font-size: 1.1em; font-weight: bold;">0.0 Mbps</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 5px;">⬇️ Download Speed</div>
+                    <div id="downloadSpeed" style="font-size: 1.1em; font-weight: bold;">0.0 Mbps</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 5px;">⚡ Latency</div>
+                    <div id="latency" style="font-size: 1.1em; font-weight: bold;">0 ms</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 5px;">📊 Jitter</div>
+                    <div id="jitter" style="font-size: 1.1em; font-weight: bold;">0 ms</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 5px;">📉 Packet Loss</div>
+                    <div id="packetLoss" style="font-size: 1.1em; font-weight: bold;">0%</div>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 5px;">🏥 Network Health</div>
+                    <div id="healthStatus" style="font-size: 1.3em; font-weight: bold; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 20px; display: inline-block;">Checking...</div>
+                </div>
+                <div style="flex: 2; min-width: 300px;">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 5px;">📈 Upload Speed Chart (Last 30 seconds)</div>
+                    <canvas id="speedChart" style="background: rgba(255,255,255,0.1); border-radius: 8px; width: 100%; height: 60px;"></canvas>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 15px; font-size: 0.85em; opacity: 0.7;">
+                <span id="lastUpdate">Last updated: Never</span> • Updates every second
+            </div>
+        </div>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <p>Click here to select files or drag and drop</p>
+                <input type="file" id="fileInput" name="files" multiple class="file-input">
+                <button type="button" class="upload-btn">Select Files</button>
+            </div>
+        </form>
+
+        <div id="selectedFiles" class="file-list"></div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing files...</p>
+        </div>
+
+        <div id="results" class="results">
+            <h3>Analysis Results</h3>
+            <div id="fileResults"></div>
+            <div id="apiInfo" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+                <h4>API Endpoints</h4>
+                <p><strong>Upload ID:</strong> <span id="uploadId"></span></p>
+                <p><strong>Model Used:</strong> <span id="modelUsed"></span></p>
+                <p><strong>Get Priority Info:</strong> <code>GET /api/priority/{upload_id}</code></p>
+                <p><strong>Get Chunk Info:</strong> <code>GET /api/chunk/{upload_id}/{file_id}</code></p>
+                <p><strong>Get File Chunk:</strong> <code>GET /api/chunk/{upload_id}/{file_id}/{chunk_number}</code></p>
+                <p><strong>Train Model:</strong> <code>POST /api/train</code></p>
+                <p><strong>Model Status:</strong> <code>GET /api/model/status</code></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const selectedFiles = document.getElementById('selectedFiles');
+        const results = document.getElementById('results');
+        const loading = document.getElementById('loading');
+
+        fileInput.addEventListener('change', handleFileSelection);
+
+        function handleFileSelection(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+
+            displaySelectedFiles(files);
+            uploadFiles(files);
+        }
+
+        function displaySelectedFiles(files) {
+            selectedFiles.innerHTML = '';
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span>${file.name}</span>
+                    <span style="margin-left: auto; color: #666;">${formatFileSize(file.size)}</span>
+                `;
+                selectedFiles.appendChild(fileItem);
+            }
+        }
+
+        async function uploadFiles(files) {
+            loading.style.display = 'block';
+            results.style.display = 'none';
+
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayResults(result);
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Upload failed: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function displayResults(data) {
+            const fileResults = document.getElementById('fileResults');
+            const uploadId = document.getElementById('uploadId');
+            const modelUsed = document.getElementById('modelUsed');
+            
+            uploadId.textContent = data.upload_id;
+            modelUsed.textContent = data.model_used || 'Unknown';
+            
+            fileResults.innerHTML = '';
+            
+            data.files.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                const confidenceText = file.confidence ? ` (${(file.confidence * 100).toFixed(1)}%)` : '';
+                const methodText = file.prediction_method === 'ml_model' ? '🤖' : '📋';
+                
+                fileItem.innerHTML = `
+                    <span class="priority-badge priority-${file.priority_level}">P${file.priority_level}</span>
+                    <span>${file.filename} ${methodText}</span>
+                    <span class="category-tag">${file.category}${confidenceText}</span>
+                    <span style="margin-left: auto; color: #666;">
+                        ${formatFileSize(file.file_size)} | Chunk: ${formatFileSize(file.chunk_size)}
+                    </span>
+                `;
+                fileResults.appendChild(fileItem);
+            });
+
+            results.style.display = 'block';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Drag and drop functionality
+        const uploadArea = document.querySelector('.upload-area');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#007bff';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ccc';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ccc';
+            
+            const files = e.dataTransfer.files;
+            fileInput.files = files;
+            handleFileSelection({ target: { files } });
+        });
+
+        // =============================================================================
+        // 🌐 NETWORK MONITORING MAGIC STARTS HERE!
+        // =============================================================================
+        // Baby, this is where we teach your computer to watch the internet playground!
+        
+        let networkChart = null;
+        let networkUpdateInterval = null;
+        
+        // Baby, this creates a beautiful chart to show how fast your internet is!
+        function initNetworkChart() {
+            const canvas = document.getElementById('speedChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Create our chart (like drawing a graph on paper)
+            networkChart = {
+                canvas: canvas,
+                ctx: ctx,
+                data: [], // This will hold our speed measurements
+                maxPoints: 30, // Keep last 30 measurements (like remembering last 30 seconds)
+                
+                // Baby, this draws the chart (like drawing lines to show how fast things are)
+                draw: function() {
+                    const width = canvas.width;
+                    const height = canvas.height;
+                    
+                    // Clear the canvas (like erasing the paper to draw new lines)
+                    this.ctx.clearRect(0, 0, width, height);
+                    
+                    if (this.data.length < 2) return; // Need at least 2 points to draw a line
+                    
+                    // Find the maximum speed to scale our chart
+                    const maxSpeed = Math.max(...this.data.map(d => d.upload), 1);
+                    
+                    // Draw the upload speed line (like connecting dots with a crayon)
+                    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    
+                    for (let i = 0; i < this.data.length; i++) {
+                        const x = (i / (this.maxPoints - 1)) * width;
+                        const y = height - (this.data[i].upload / maxSpeed) * height;
+                        
+                        if (i === 0) {
+                            this.ctx.moveTo(x, y);
+                        } else {
+                            this.ctx.lineTo(x, y);
+                        }
+                    }
+                    
+                    this.ctx.stroke();
+                    
+                    // Add a gentle glow effect (like making our line sparkle)
+                    this.ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+                    this.ctx.shadowBlur = 3;
+                    this.ctx.stroke();
+                    this.ctx.shadowBlur = 0;
+                },
+                
+                // Baby, this adds a new measurement to our chart
+                addData: function(uploadSpeed) {
+                    this.data.push({ upload: uploadSpeed });
+                    
+                    // Keep only the last maxPoints measurements
+                    if (this.data.length > this.maxPoints) {
+                        this.data.shift(); // Remove the oldest measurement
+                    }
+                    
+                    this.draw(); // Redraw the chart with new data
+                }
+            };
+            
+            // Set canvas size (like preparing our drawing paper)
+            canvas.width = canvas.offsetWidth * 2; // High resolution for crisp lines
+            canvas.height = 60 * 2;
+            canvas.style.width = canvas.offsetWidth + 'px';
+            canvas.style.height = '60px';
+        }
+        
+        // Baby, this asks the server how the internet playground is doing
+        async function updateNetworkStatus() {
+            try {
+                const response = await fetch('/api/network/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update all our display elements (like updating report cards)
+                    document.getElementById('wifiName').textContent = data.wifi_name || 'Unknown Network';
+                    document.getElementById('uploadSpeed').textContent = `${data.upload_speed.toFixed(1)} Mbps`;
+                    document.getElementById('downloadSpeed').textContent = `${data.download_speed.toFixed(1)} Mbps`;
+                    document.getElementById('latency').textContent = `${data.latency.toFixed(0)} ms`;
+                    document.getElementById('jitter').textContent = `${data.jitter.toFixed(0)} ms`;
+                    document.getElementById('packetLoss').textContent = `${data.packet_loss.toFixed(1)}%`;
+                    
+                    // Update health status with pretty colors (like giving gold stars)
+                    const healthElement = document.getElementById('healthStatus');
+                    healthElement.textContent = data.health_status;
+                    
+                    // Change color based on health (like traffic lights)
+                    if (data.health_status === 'Excellent') {
+                        healthElement.style.background = 'rgba(34, 197, 94, 0.8)'; // Green for excellent
+                    } else if (data.health_status === 'Good') {
+                        healthElement.style.background = 'rgba(59, 130, 246, 0.8)'; // Blue for good
+                    } else if (data.health_status === 'Weak') {
+                        healthElement.style.background = 'rgba(251, 191, 36, 0.8)'; // Yellow for weak
+                    } else {
+                        healthElement.style.background = 'rgba(239, 68, 68, 0.8)'; // Red for poor
+                    }
+                    
+                    // Update our chart with new speed data
+                    if (networkChart) {
+                        networkChart.addData(data.upload_speed);
+                    }
+                    
+                    // Update the last update time (like writing when we last checked)
+                    const now = new Date();
+                    document.getElementById('lastUpdate').textContent = 
+                        `Last updated: ${now.toLocaleTimeString()}`;
+                        
+                } else {
+                    // If something went wrong, show gentle error message
+                    console.log('Network monitoring temporarily unavailable:', data.error);
+                }
+                
+            } catch (error) {
+                // If we can't reach the server, that's okay - we'll try again soon
+                console.log('Network update temporarily unavailable:', error);
+            }
+        }
+        
+        // Baby, this starts our network monitoring when the page loads
+        function startNetworkMonitoring() {
+            // Create our beautiful chart
+            initNetworkChart();
+            
+            // Get initial network status (like taking our first measurement)
+            updateNetworkStatus();
+            
+            // Update every second (like checking the playground every second)
+            networkUpdateInterval = setInterval(updateNetworkStatus, 1000);
+            
+            console.log('🌐 Network monitoring started! Watching your internet playground...');
+        }
+        
+        // Baby, this stops our network monitoring if needed
+        function stopNetworkMonitoring() {
+            if (networkUpdateInterval) {
+                clearInterval(networkUpdateInterval);
+                networkUpdateInterval = null;
+                console.log('🌐 Network monitoring stopped.');
+            }
+        }
+        
+        // Start monitoring when the page is ready (like starting to watch the playground)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a little bit for everything to load, then start monitoring
+            setTimeout(startNetworkMonitoring, 1000);
+        });
+        
+        // Stop monitoring when leaving the page (like saying goodbye to the playground)
+        window.addEventListener('beforeunload', stopNetworkMonitoring);
+        
+        // =============================================================================
+        // 🌐 NETWORK MONITORING MAGIC ENDS HERE!
+        // =============================================================================
+    </script>
+
+    <!-- 🤖 SMART CHATBOT ASSISTANT -->
+    <script src="/static/js/SmartBrain.js"></script>
+    <script src="/static/js/ChatAssistant.js"></script>
+    <script>
+        // Initialize the Smart Chatbot Assistant
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a moment for all systems to load
+            setTimeout(() => {
+                ChatAssistant.init();
+                console.log('🤖 Smart Assistant activated!');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

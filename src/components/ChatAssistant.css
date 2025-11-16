@@ -1,0 +1,503 @@
+/**
+ * 🎨 CHAT ASSISTANT STYLES
+ * 
+ * This makes our chatbot look beautiful and professional!
+ * Like decorating a cozy chat room with:
+ * • Smooth animations
+ * • Pretty colors
+ * • Comfortable spacing
+ * • Mobile-friendly design
+ * 
+ * Everything is designed to be non-intrusive and lovely! 
+ */
+
+/* 🎈 Main Chat Container */
+.chat-assistant {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 🎭 Toggle Button - the friendly door knocker! */
+.chat-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+}
+
+.chat-toggle.active {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+}
+
+/* 🔔 Notification Badge */
+.chat-notification {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4757;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* 💬 Chat Window - the cozy chat room! */
+.chat-window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 380px;
+    height: 500px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 📋 Chat Header - the friendly greeting area! */
+.chat-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chat-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brain-icon {
+    font-size: 24px;
+    animation: think 3s ease-in-out infinite;
+}
+
+@keyframes think {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.chat-title h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.chat-title p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.chat-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.help-btn, .clear-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.help-btn:hover, .clear-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 💬 Messages Container - where conversations happen! */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Custom scrollbar */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+}
+
+/* 💭 Individual Messages */
+.message {
+    display: flex;
+    margin-bottom: 8px;
+}
+
+.message-content {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    position: relative;
+}
+
+/* 👤 User Messages - on the right */
+.user-message {
+    justify-content: flex-end;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom-right-radius: 6px;
+}
+
+/* 🤖 Bot Messages - on the left */
+.bot-message {
+    justify-content: flex-start;
+}
+
+.bot-message .message-content {
+    background: white;
+    color: #2c3e50;
+    border: 1px solid #e9ecef;
+    border-bottom-left-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 🎨 Special Message Types */
+.bot-message.social .message-content {
+    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    border: 1px solid #e17055;
+}
+
+.bot-message.low-confidence .message-content {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+/* 📝 Message Text */
+.message-text {
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.message-text strong {
+    font-weight: 600;
+}
+
+.message-text em {
+    font-style: italic;
+    color: #6c757d;
+}
+
+/* ⏰ Message Time and Category */
+.message-time {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.message-category {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+/* 💭 Typing Indicator */
+.typing .message-content {
+    background: white;
+    border: 1px solid #e9ecef;
+    padding: 16px 20px;
+}
+
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #adb5bd;
+    animation: typing 1.4s ease-in-out infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+    30% {
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+}
+
+/* ⌨️ Input Area - where the magic begins! */
+.chat-input-area {
+    background: white;
+    border-top: 1px solid #e9ecef;
+    padding: 16px;
+}
+
+.input-container {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.chat-input {
+    flex: 1;
+    border: 1px solid #dee2e6;
+    border-radius: 20px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    max-height: 100px;
+    transition: border-color 0.3s ease;
+    outline: none;
+}
+
+.chat-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.chat-input:disabled {
+    background: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.send-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.send-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.send-btn:disabled {
+    background: #dee2e6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.input-hint {
+    font-size: 11px;
+    color: #6c757d;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* 📱 Mobile Responsiveness - making it work on tiny screens! */
+@media (max-width: 768px) {
+    .chat-assistant {
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    .chat-window {
+        width: calc(100vw - 20px);
+        max-width: 380px;
+        height: 70vh;
+        max-height: 500px;
+        right: -10px;
+    }
+    
+    .chat-toggle {
+        width: 56px;
+        height: 56px;
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-window {
+        bottom: 70px;
+        right: -10px;
+        width: calc(100vw - 20px);
+        height: 60vh;
+    }
+    
+    .message-content {
+        max-width: 85%;
+    }
+}
+
+/* 🎭 Dark Mode Support (for night owls!) */
+@media (prefers-color-scheme: dark) {
+    .chat-window {
+        background: #2c3e50;
+        color: #ecf0f1;
+    }
+    
+    .chat-messages {
+        background: #34495e;
+    }
+    
+    .bot-message .message-content {
+        background: #3c5a78;
+        border-color: #4a6fa5;
+        color: #ecf0f1;
+    }
+    
+    .chat-input-area {
+        background: #2c3e50;
+        border-color: #4a6fa5;
+    }
+    
+    .chat-input {
+        background: #34495e;
+        border-color: #4a6fa5;
+        color: #ecf0f1;
+    }
+    
+    .chat-input:focus {
+        border-color: #667eea;
+    }
+}
+
+/* 🌟 Accessibility Improvements */
+.chat-toggle:focus,
+.send-btn:focus,
+.help-btn:focus,
+.clear-btn:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.chat-input:focus {
+    outline: none; /* We handle this with box-shadow */
+}
+
+/* 🎨 High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .chat-window {
+        border: 2px solid #000;
+    }
+    
+    .message-content {
+        border: 1px solid #000;
+    }
+    
+    .chat-input {
+        border: 2px solid #000;
+    }
+}
+
+/* ✨ Reduced Motion Support (for sensitive users) */
+@media (prefers-reduced-motion: reduce) {
+    .chat-window {
+        animation: none;
+    }
+    
+    .chat-toggle {
+        transition: none;
+    }
+    
+    .brain-icon {
+        animation: none;
+    }
+    
+    .typing-indicator span {
+        animation: none;
+    }
+    
+    .chat-notification {
+        animation: none;
+    }
+}

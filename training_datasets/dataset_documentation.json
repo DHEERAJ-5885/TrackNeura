@@ -1,0 +1,112 @@
+{
+  "datasets": {
+    "comprehensive_dataset.csv": {
+      "description": "Complete dataset with all features for training the full system",
+      "samples": 1000,
+      "features": [
+        "file_id",
+        "filename",
+        "file_size",
+        "file_type",
+        "user_priority",
+        "time_sensitive",
+        "network_condition",
+        "chunk_size",
+        "upload_time",
+        "optimal_priority",
+        "success",
+        "actual_speed",
+        "transfer_time",
+        "error_count",
+        "retry_count",
+        "wait_time",
+        "context_tags",
+        "hour_of_day",
+        "day_of_week",
+        "file_extension"
+      ],
+      "use_case": "Training comprehensive ML models for priority, speed, and success prediction"
+    },
+    "file_priority_dataset.csv": {
+      "description": "Focused dataset for file priority prediction",
+      "samples": 500,
+      "features": [
+        "filename",
+        "file_size",
+        "file_type",
+        "user_priority",
+        "time_sensitive",
+        "priority_score",
+        "file_extension"
+      ],
+      "use_case": "Training priority scoring models"
+    },
+    "network_performance_dataset.csv": {
+      "description": "Network condition and performance patterns",
+      "samples": 300,
+      "features": [
+        "network_condition",
+        "file_type",
+        "file_size",
+        "predicted_speed",
+        "success_probability",
+        "transfer_time",
+        "error_count"
+      ],
+      "use_case": "Training network adaptation and speed prediction"
+    },
+    "small_test_dataset.csv": {
+      "description": "Smaller dataset for quick testing and development",
+      "samples": 100,
+      "features": [
+        "file_id",
+        "filename",
+        "file_size",
+        "file_type",
+        "user_priority",
+        "time_sensitive",
+        "network_condition",
+        "chunk_size",
+        "upload_time",
+        "optimal_priority",
+        "success",
+        "actual_speed",
+        "transfer_time",
+        "error_count",
+        "retry_count",
+        "wait_time",
+        "context_tags",
+        "hour_of_day",
+        "day_of_week",
+        "file_extension"
+      ],
+      "use_case": "Development and testing"
+    }
+  },
+  "file_types": [
+    "emergency",
+    "document",
+    "image",
+    "video",
+    "audio",
+    "archive",
+    "code",
+    "other"
+  ],
+  "network_conditions": [
+    "excellent",
+    "good",
+    "fair",
+    "poor",
+    "critical"
+  ],
+  "user_priorities": [
+    5,
+    4,
+    3,
+    2,
+    1
+  ],
+  "generation_time": "2025-11-16T00:04:49.844931",
+  "generator_version": "1.0"
+}

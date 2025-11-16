@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Connection Test - AI Chatbot System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        .status { font-size: 1.2rem; margin: 20px 0; }
+        .success { color: #4CAF50; }
+        .warning { color: #FFC107; }
+        .error { color: #F44336; }
+        .test-btn {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(66, 133, 244, 0.4);
+        }
+        .url-list {
+            text-align: left;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .url-list a {
+            color: #4CAF50;
+            text-decoration: none;
+            display: block;
+            margin: 5px 0;
+            font-size: 18px;
+        }
+        .url-list a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Connection Test Success!</h1>
+        
+        <div class="status success">
+            ✅ Server is running successfully!
+        </div>
+        
+        <div class="status warning">
+            ⚠️ Gemini API key not configured (this is normal for testing)
+        </div>
+        
+        <h2>🌐 Try These URLs:</h2>
+        <div class="url-list">
+            <a href="http://127.0.0.1:5000" target="_blank">📍 http://127.0.0.1:5000</a>
+            <a href="http://localhost:5000" target="_blank">📍 http://localhost:5000</a>
+            <a href="http://192.168.8.97:5000" target="_blank">📍 http://192.168.8.97:5000</a>
+        </div>
+        
+        <h2>🤖 Test AI Endpoints:</h2>
+        <button class="test-btn" onclick="testAI()">Test AI Status</button>
+        <button class="test-btn" onclick="testChat()">Test AI Chat</button>
+        
+        <div id="testResults" style="margin-top: 20px; text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; display: none;">
+            <h3>Test Results:</h3>
+            <pre id="results"></pre>
+        </div>
+        
+        <h2>📋 Troubleshooting:</h2>
+        <ul style="text-align: left;">
+            <li>✅ Server is confirmed running on port 5000</li>
+            <li>🔄 Try refreshing the page or clearing browser cache</li>
+            <li>🌐 Try a different browser or incognito mode</li>
+            <li>🔥 Check Windows Firewall settings</li>
+            <li>🔗 Try the different URLs listed above</li>
+        </ul>
+    </div>
+
+    <script>
+        async function testAI() {
+            const results = document.getElementById('results');
+            const container = document.getElementById('testResults');
+            
+            try {
+                const response = await fetch('/api/ai/status');
+                const data = await response.json();
+                results.textContent = JSON.stringify(data, null, 2);
+                container.style.display = 'block';
+            } catch (error) {
+                results.textContent = 'Error: ' + error.message;
+                container.style.display = 'block';
+            }
+        }
+        
+        async function testChat() {
+            const results = document.getElementById('results');
+            const container = document.getElementById('testResults');
+            
+            try {
+                const response = await fetch('/api/ai/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: 'Hello, are you working?' })
+                });
+                const data = await response.json();
+                results.textContent = JSON.stringify(data, null, 2);
+                container.style.display = 'block';
+            } catch (error) {
+                results.textContent = 'Error: ' + error.message;
+                container.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
